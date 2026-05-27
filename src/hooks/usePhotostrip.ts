@@ -1,13 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { BorderId } from '../types'
 import { composeStrip } from '../utils/composeStrip'
 import { downloadCanvas, shareCanvas } from '../utils/canvas'
 
-export function usePhotostrip(
-  photos: string[],
-  borderId: BorderId,
-  showDate: boolean,
-) {
+export function usePhotostrip(photos: string[]) {
   const [stripCanvas, setStripCanvas] = useState<HTMLCanvasElement | null>(null)
   const [stripUrl, setStripUrl] = useState<string | null>(null)
   const [composing, setComposing] = useState(false)
@@ -25,7 +20,7 @@ export function usePhotostrip(
     setComposing(true)
     setComposeError(null)
 
-    void composeStrip(photos, borderId, { showDate })
+    void composeStrip(photos)
       .then((canvas) => {
         if (cancelled) return
         setStripCanvas(canvas)
@@ -42,7 +37,7 @@ export function usePhotostrip(
     return () => {
       cancelled = true
     }
-  }, [photos, borderId, showDate])
+  }, [photos])
 
   const download = useCallback(
     (format: 'png' | 'jpeg') => {

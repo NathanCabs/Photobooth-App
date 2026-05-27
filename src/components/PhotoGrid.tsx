@@ -1,11 +1,13 @@
 import { PHOTO_COUNT } from '../types'
+import type { CustomFrameLayout } from '../utils/customFrameLayouts'
 
 type PhotoGridProps = {
   photos: string[]
   currentShot: number
+  customLayouts?: CustomFrameLayout[] | null
 }
 
-export function PhotoGrid({ photos, currentShot }: PhotoGridProps) {
+export function PhotoGrid({ photos, currentShot, customLayouts }: PhotoGridProps) {
   if (photos.length === 0 && currentShot === 0) return null
 
   return (
@@ -19,12 +21,19 @@ export function PhotoGrid({ photos, currentShot }: PhotoGridProps) {
         {Array.from({ length: PHOTO_COUNT }, (_, i) => {
           const src = photos[i]
           const isNext = i === photos.length && currentShot > photos.length
+          const layout = customLayouts?.[i]
+          const aspectStyle = layout
+            ? { aspectRatio: `${layout.holeBounds.w} / ${layout.holeBounds.h}` }
+            : undefined
+          const aspectClass = layout ? '' : 'aspect-[3/4]'
+
           return (
             <div
               key={i}
-              className={`aspect-[3/4] overflow-hidden rounded-lg bg-zinc-800 ring-2 ${
+              className={`${aspectClass} overflow-hidden rounded-lg bg-zinc-800 ring-2 ${
                 isNext ? 'ring-pink-400' : 'ring-transparent'
               }`}
+              style={aspectStyle}
             >
               {src ? (
                 <img src={src} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />

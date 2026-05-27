@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import type { CaptureStatus, FilterId } from '../types'
 import { COUNTDOWN_SECONDS, PHOTO_COUNT } from '../types'
 import { canvasToDataUrl, captureFrame, waitForVideoDimensions } from '../utils/canvas'
+import type { CustomFrameLayout } from '../utils/customFrameLayouts'
 
 function delay(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
@@ -33,7 +34,11 @@ export function useCapture() {
   }, [clearCaptureUi])
 
   const runCapture = useCallback(
-    async (video: HTMLVideoElement, filterId: FilterId): Promise<CaptureResult> => {
+    async (
+      video: HTMLVideoElement,
+      filterId: FilterId,
+      customLayouts: CustomFrameLayout[] | null,
+    ): Promise<CaptureResult> => {
       if (capturingRef.current) {
         return 'cancelled'
       }
@@ -69,6 +74,10 @@ export function useCapture() {
 
         if (abortRef.current) return finishCancelled()
 
+        if (!customLayouts) {
+          return finishCancelled()
+        }
+
         const captured: string[] = []
 
         for (let shot = 0; shot < PHOTO_COUNT; shot++) {
@@ -88,7 +97,11 @@ export function useCapture() {
             return finishCancelled()
           }
 
-          const frame = captureFrame(video, filterId)
+          const { holeBounds } = customLayouts[shot]
+          const frame = captureFrame(video, filterId, {
+            width: holeBounds.w,
+            height: holeBounds.h,
+          })
           captured.push(canvasToDataUrl(frame))
           setPhotos([...captured])
         }

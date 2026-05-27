@@ -6,8 +6,6 @@ export type FilterId =
   | 'cool'
   | 'warm'
 
-export type BorderId = 'classic' | 'polaroid' | 'film' | 'branded'
-
 export type BoothPhase = 'landing' | 'booth' | 'preview'
 
 export type CaptureStatus = 'idle' | 'countdown' | 'capturing' | 'done'

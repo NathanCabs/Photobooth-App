@@ -1,31 +1,30 @@
 import { useCallback, useState } from 'react'
 import { CameraStage } from './components/CameraStage'
-import { ControlPanel } from './components/ControlPanel'
+import { CapturePanel, FilterPanel } from './components/ControlPanel'
 import { Landing } from './components/Landing'
 import { PermissionError } from './components/PermissionError'
 import { PhotoGrid } from './components/PhotoGrid'
 import { StripPreview } from './components/StripPreview'
 import { useCamera } from './hooks/useCamera'
 import { useCapture } from './hooks/useCapture'
+import { useCustomFrameLayouts } from './hooks/useCustomFrameLayouts'
 import { usePhotostrip } from './hooks/usePhotostrip'
-import type { BorderId, BoothPhase, FilterId } from './types'
+import type { BoothPhase, FilterId } from './types'
 
 export default function App() {
   const [phase, setPhase] = useState<BoothPhase>('landing')
   const [filterId, setFilterId] = useState<FilterId>('none')
-  const [borderId, setBorderId] = useState<BorderId>('classic')
-  const [showDate, setShowDate] = useState(true)
 
   const { videoRef, ready, loading, error, startCamera, stopCamera } =
     useCamera(phase === 'booth')
+
+  const { layouts: customLayouts } = useCustomFrameLayouts(phase === 'booth')
 
   const { status, countdown, photos, currentShot, flash, runCapture, reset } =
     useCapture()
 
   const { stripUrl, composing, composeError, download, share } = usePhotostrip(
     phase === 'preview' ? photos : [],
-    borderId,
-    showDate,
   )
 
   const handleStart = useCallback(() => {
@@ -41,12 +40,12 @@ export default function App() {
   const handleCapture = useCallback(() => {
     const video = videoRef.current
     if (!video || !ready) return
-    void runCapture(video, filterId).then((result) => {
+    void runCapture(video, filterId, customLayouts).then((result) => {
       if (result === 'completed') {
         setPhase('preview')
       }
     })
-  }, [videoRef, ready, runCapture, filterId])
+  }, [videoRef, ready, runCapture, filterId, customLayouts])
 
   const handleRetake = useCallback(() => {
     reset()
@@ -54,7 +53,8 @@ export default function App() {
   }, [reset])
 
   const captureBusy = status === 'countdown' || status === 'capturing'
-  const captureDisabled = !ready || captureBusy
+  const customFramesLoading = !customLayouts
+  const captureDisabled = !ready || captureBusy || customFramesLoading
 
   const canShare =
     typeof navigator !== 'undefined' &&
@@ -104,37 +104,59 @@ export default function App() {
         </button>
       </header>
 
-      <div className="mx-auto flex max-w-5xl flex-col gap-8 lg:flex-row lg:items-start lg:justify-center">
+      <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-8 lg:grid-cols-[240px_1fr] lg:gap-6">
+        <div className="hidden lg:block">
+          <FilterPanel
+            filterId={filterId}
+            onFilterChange={setFilterId}
+            captureDisabled={captureDisabled}
+          />
+        </div>
+
         <div className="flex flex-col items-center gap-4">
+          <div className="w-full max-w-md flex flex-col gap-4 lg:hidden">
+            <FilterPanel
+              filterId={filterId}
+              onFilterChange={setFilterId}
+              captureDisabled={captureDisabled}
+            />
+          </div>
+
           <CameraStage
             videoRef={videoRef}
             filterId={filterId}
+            customLayouts={customLayouts}
+            currentShot={currentShot}
+            capturedCount={photos.length}
             ready={ready}
             loading={loading}
             countdown={countdown}
             flash={flash}
             capturing={captureBusy}
           />
-          <PhotoGrid photos={photos} currentShot={currentShot} />
-        </div>
+          <PhotoGrid
+            photos={photos}
+            currentShot={currentShot}
+            customLayouts={customLayouts}
+          />
 
-        <ControlPanel
-          filterId={filterId}
-          borderId={borderId}
-          showDate={showDate}
-          onFilterChange={setFilterId}
-          onBorderChange={setBorderId}
-          onShowDateChange={setShowDate}
-          onCapture={handleCapture}
-          captureDisabled={captureDisabled}
-          captureLabel={
-            captureBusy
-              ? status === 'countdown'
-                ? 'Get ready…'
-                : 'Capturing…'
-              : 'Take photos'
-          }
-        />
+          <CapturePanel
+            showDate={false}
+            onShowDateChange={() => {}}
+            showDateOption={false}
+            onCapture={handleCapture}
+            captureDisabled={captureDisabled}
+            captureLabel={
+              captureBusy
+                ? status === 'countdown'
+                  ? 'Get ready…'
+                  : 'Capturing…'
+                : customFramesLoading
+                  ? 'Loading frames…'
+                  : 'Take photos'
+            }
+          />
+        </div>
       </div>
     </div>
   )

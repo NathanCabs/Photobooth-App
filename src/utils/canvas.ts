@@ -35,13 +35,19 @@ export function waitForVideoDimensions(
   })
 }
 
+export type CaptureOutputSize = { width: number; height: number }
+
 export function captureFrame(
   video: HTMLVideoElement,
   filterId: FilterId,
+  outputSize?: CaptureOutputSize,
 ): HTMLCanvasElement {
+  const outW = outputSize?.width ?? PHOTO_SLOT_WIDTH
+  const outH = outputSize?.height ?? PHOTO_SLOT_HEIGHT
+
   const canvas = document.createElement('canvas')
-  canvas.width = PHOTO_SLOT_WIDTH
-  canvas.height = PHOTO_SLOT_HEIGHT
+  canvas.width = outW
+  canvas.height = outH
   const ctx = canvas.getContext('2d')
   if (!ctx) return canvas
 
@@ -49,7 +55,7 @@ export function captureFrame(
   const vh = video.videoHeight
   if (vw === 0 || vh === 0) return canvas
 
-  const targetAspect = PHOTO_SLOT_WIDTH / PHOTO_SLOT_HEIGHT
+  const targetAspect = outW / outH
   const videoAspect = vw / vh
 
   let sx = 0
@@ -66,9 +72,9 @@ export function captureFrame(
   }
 
   ctx.filter = getFilterCss(filterId)
-  ctx.translate(PHOTO_SLOT_WIDTH, 0)
+  ctx.translate(outW, 0)
   ctx.scale(-1, 1)
-  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, PHOTO_SLOT_WIDTH, PHOTO_SLOT_HEIGHT)
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH)
   ctx.setTransform(1, 0, 0, 1, 0, 0)
 
   return canvas
