@@ -14,4 +14,3 @@ export type CaptureStatus = 'idle' | 'countdown' | 'capturing' | 'done'
 
 export const PHOTO_COUNT = 4
 export const COUNTDOWN_SECONDS = 3
-export const BETWEEN_SHOTS_MS = 1500

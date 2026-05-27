@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import type { CaptureStatus, FilterId } from '../types'
-import { BETWEEN_SHOTS_MS, COUNTDOWN_SECONDS, PHOTO_COUNT } from '../types'
+import { COUNTDOWN_SECONDS, PHOTO_COUNT } from '../types'
 import { canvasToDataUrl, captureFrame, waitForVideoDimensions } from '../utils/canvas'
 
 function delay(ms: number) {
@@ -46,20 +46,20 @@ export function useCapture() {
         return 'cancelled'
       }
 
-      try {
-        setPhotos([])
-        setCurrentShot(0)
+      const runCountdown = async (): Promise<boolean> => {
         setStatus('countdown')
-
         for (let i = COUNTDOWN_SECONDS; i >= 1; i--) {
-          if (abortRef.current) return finishCancelled()
+          if (abortRef.current) return false
           setCountdown(i)
           await delay(1000)
         }
         setCountdown(null)
+        return !abortRef.current
+      }
 
-        if (abortRef.current) return finishCancelled()
-        setStatus('capturing')
+      try {
+        setPhotos([])
+        setCurrentShot(0)
 
         try {
           await waitForVideoDimensions(video)
@@ -74,6 +74,9 @@ export function useCapture() {
         for (let shot = 0; shot < PHOTO_COUNT; shot++) {
           if (abortRef.current) return finishCancelled()
 
+          if (!(await runCountdown())) return finishCancelled()
+
+          setStatus('capturing')
           setCurrentShot(shot + 1)
           setFlash(true)
           await delay(80)
@@ -88,10 +91,6 @@ export function useCapture() {
           const frame = captureFrame(video, filterId)
           captured.push(canvasToDataUrl(frame))
           setPhotos([...captured])
-
-          if (shot < PHOTO_COUNT - 1) {
-            await delay(BETWEEN_SHOTS_MS)
-          }
         }
 
         if (abortRef.current) return finishCancelled()
