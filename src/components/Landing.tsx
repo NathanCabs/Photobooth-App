@@ -11,11 +11,10 @@ export function Landing({ onStart }: LandingProps) {
         </span>
       </div>
       <h1 className="mb-3 text-4xl font-bold tracking-tight text-white sm:text-5xl">
-        Photobooth
+        LOVE&POP Photobooth
       </h1>
       <p className="mb-10 max-w-md text-lg text-zinc-400">
-        Take a classic 4-photo strip, add filters and frames, then download or
-        share your memories.
+        A simple project made by WAV. <br/>Take a classic 4-photo strip using our custom Love&Pop frames.
       </p>
       <button
         type="button"
@@ -27,6 +26,11 @@ export function Landing({ onStart }: LandingProps) {
       <p className="mt-8 text-sm text-zinc-500">
         Camera access required · Works on HTTPS or localhost
       </p>
+
+      <footer className="mt-8 text-sm text-zinc-500">
+        <p>Made with ❤️ by <a href="https://x.com/DRealGahyeongum" target="_blank" className="text-white" rel="noopener noreferrer">Gum</a></p>
+        <p>Frames made with ❤️ by <a href="https://x.com/civacious" target="_blank" className="text-white" rel="noopener noreferrer">civv²⁴</a></p>
+      </footer>
     </div>
   )
 }
