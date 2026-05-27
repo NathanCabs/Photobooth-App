@@ -1,0 +1,82 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-booth-accent: #f472b6;
+  --color-booth-dark: #0f0f14;
+  --color-booth-panel: #1a1a24;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--color-booth-dark);
+  color: #f4f4f5;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+}
+
+/* Modern horizontal scroll for filter/border chip rows */
+.chip-scroll {
+  --chip-scroll-size: 6px;
+  --chip-scroll-track: rgb(39 39 42 / 0.55);
+  --chip-scroll-thumb: linear-gradient(90deg, #db2777, #f472b6);
+  --chip-scroll-thumb-hover: linear-gradient(90deg, #ec4899, #fb7185);
+
+  padding-bottom: 0.5rem;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #f472b6 var(--chip-scroll-track);
+}
+
+.chip-scroll::-webkit-scrollbar {
+  height: var(--chip-scroll-size);
+}
+
+.chip-scroll::-webkit-scrollbar-track {
+  margin-inline: 0.25rem;
+  border-radius: 9999px;
+  background: var(--chip-scroll-track);
+  box-shadow: inset 0 0 0 1px rgb(63 63 70 / 0.35);
+}
+
+.chip-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: var(--chip-scroll-thumb);
+  box-shadow:
+    0 0 8px rgb(244 114 182 / 0.35),
+    inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+
+.chip-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--chip-scroll-thumb-hover);
+}
+
+.chip-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .chip-scroll:not(:hover)::-webkit-scrollbar-thumb {
+    background: rgb(82 82 91);
+    box-shadow: none;
+  }
+
+  .chip-scroll:not(:hover) {
+    scrollbar-color: rgb(82 82 91) var(--chip-scroll-track);
+  }
+
+  .chip-scroll:hover::-webkit-scrollbar-thumb {
+    background: var(--chip-scroll-thumb);
+    box-shadow:
+      0 0 8px rgb(244 114 182 / 0.35),
+      inset 0 1px 0 rgb(255 255 255 / 0.2);
+  }
+
+  .chip-scroll:hover {
+    scrollbar-color: #f472b6 var(--chip-scroll-track);
+  }
+}
