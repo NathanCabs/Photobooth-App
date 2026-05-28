@@ -12,7 +12,7 @@ export type FrameMaskAssets = {
 
 const maskCache = new Map<string, FrameMaskAssets>()
 
-function isHolePixel(r: number, g: number, b: number, a:number): boolean {
+function isHolePixel(a:number): boolean {
   return a < 10
 }
 
@@ -30,7 +30,7 @@ function computeHoleBounds(
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const i = (y * width + x) * 4
-      if (isHolePixel(data[i], data[i + 1], data[i + 2], data[i + 3])) {
+      if (isHolePixel(data[i + 3])) {
         found = true
         if (x < minX) minX = x
         if (y < minY) minY = y
@@ -74,7 +74,7 @@ function buildMaskAssets(frame: HTMLImageElement): FrameMaskAssets {
 
   const holeMaskData = holeMaskCtx.createImageData(width, height)
   for (let i = 0; i < data.length; i += 4) {
-    const hole = isHolePixel(data[i], data[i + 1], data[i + 2], data[i + 3])
+    const hole = isHolePixel(data[i + 3])
     holeMaskData.data[i] = 255
     holeMaskData.data[i + 1] = 255
     holeMaskData.data[i + 2] = 255
@@ -92,7 +92,7 @@ function buildMaskAssets(frame: HTMLImageElement): FrameMaskAssets {
 
   const overlayData = overlayCtx.createImageData(width, height)
   for (let i = 0; i < data.length; i += 4) {
-    const hole = isHolePixel(data[i], data[i + 1], data[i + 2], data[i + 3])
+    const hole = isHolePixel(data[i + 3])
     overlayData.data[i] = data[i]
     overlayData.data[i + 1] = data[i + 1]
     overlayData.data[i + 2] = data[i + 2]
