@@ -10,6 +10,7 @@ import { useCapture } from './hooks/useCapture'
 import { useCustomFrameLayouts } from './hooks/useCustomFrameLayouts'
 import { usePhotostrip } from './hooks/usePhotostrip'
 import type { BoothPhase, FilterId } from './types'
+import wavLogo from './assets/WAV.png'
 
 export default function App() {
   // State management  
@@ -126,8 +127,10 @@ export default function App() {
     /* Main container */
     <div className="min-h-dvh bg-[#0f0f14] px-4 py-6">
       {/* Header */}
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">Love&Pop Photobooth made by 🌊</h1>
+      <header className="mb-6 flex items-center justify-between lg:-mt-10">
+      <h1 className="lg:text-xl text-l font-bold text-white">
+        Love&Pop Photobooth made by <img src={wavLogo} alt="WAV" className="h-[5em] w-auto inline-block" /> 
+      </h1>
         {/* Exit button */}
         <button
           type="button"
