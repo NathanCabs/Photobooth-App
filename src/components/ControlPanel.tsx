@@ -45,9 +45,6 @@ export function FilterPanel({
 }
 
 type CapturePanelProps = {
-  showDate: boolean
-  onShowDateChange: (value: boolean) => void
-  showDateOption?: boolean
   onCapture: () => void
   captureDisabled: boolean
   captureLabel: string
@@ -55,9 +52,6 @@ type CapturePanelProps = {
 }
 
 export function CapturePanel({
-  showDate,
-  onShowDateChange,
-  showDateOption = true,
   onCapture,
   captureDisabled,
   captureLabel,
@@ -69,19 +63,7 @@ export function CapturePanel({
         className ?? ''
       }`}
     >
-      {showDateOption && (
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-zinc-300">
-          <input
-            type="checkbox"
-            checked={showDate}
-            onChange={(e) => onShowDateChange(e.target.checked)}
-            disabled={captureDisabled}
-            className="h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-pink-500 focus:ring-pink-400"
-          />
-          Add date stamp on strip
-        </label>
-      )}
-
+      
       <button
         type="button"
         onClick={onCapture}

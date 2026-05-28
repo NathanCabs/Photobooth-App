@@ -12,31 +12,47 @@ import { usePhotostrip } from './hooks/usePhotostrip'
 import type { BoothPhase, FilterId } from './types'
 
 export default function App() {
+  // State management  
+  // Phase state, filter state 
   const [phase, setPhase] = useState<BoothPhase>('landing')
   const [filterId, setFilterId] = useState<FilterId>('none')
 
+  // Camera hook
+  // Video reference, ready state, loading state, error state, start camera function, stop camera function if phase is booth
   const { videoRef, ready, loading, error, startCamera, stopCamera } =
     useCamera(phase === 'booth')
 
+  // Custom frame layouts hook
+  // Custom frame layouts, error state if phase is booth
   const { layouts: customLayouts } = useCustomFrameLayouts(phase === 'booth')
 
+  // Capture hook
+  // Capture status, countdown, photos, current shot, flash state, run capture function, reset function
   const { status, countdown, photos, currentShot, flash, runCapture, reset } =
     useCapture()
 
+  // Photostrip hook
+  // Strip URL, composing state, compose error, download function, share function if phase is preview and photos is not empty else empty array
   const { stripUrl, composing, composeError, download, share } = usePhotostrip(
     phase === 'preview' ? photos : [],
   )
 
+  // Event handlers
+  // Handle start button click set phase to booth
   const handleStart = useCallback(() => {
     setPhase('booth')
   }, [])
 
+  // Handle back button click
+  // Reset capture, stop camera, set phase to landing 
   const handleBack = useCallback(() => {
     reset()
     stopCamera()
     setPhase('landing')
   }, [reset, stopCamera])
 
+  // Handle capture button click
+  // Run capture function, set phase to preview if capture is completed
   const handleCapture = useCallback(() => {
     const video = videoRef.current
     if (!video || !ready) return
@@ -47,24 +63,36 @@ export default function App() {
     })
   }, [videoRef, ready, runCapture, filterId, customLayouts])
 
+  // Handle retake button click
+  // Reset capture, set phase to booth
   const handleRetake = useCallback(() => {
     reset()
     setPhase('booth')
   }, [reset])
 
+  // Capture busy state if status is countdown or capturing
+  // Custom frames loading state if custom layouts is not loaded
+  // Capture disabled state if ready is false or capture busy or custom frames loading
   const captureBusy = status === 'countdown' || status === 'capturing'
   const customFramesLoading = !customLayouts
   const captureDisabled = !ready || captureBusy || customFramesLoading
 
+  // Can share state
+  // If navigator is defined and share and can share functions are defined
   const canShare =
     typeof navigator !== 'undefined' &&
     typeof navigator.share === 'function' &&
     typeof navigator.canShare === 'function'
 
+  // Landing phase
+  // Return landing component if phase is landing 
   if (phase === 'landing') {
     return <Landing onStart={handleStart} />
   }
 
+  // Preview phase
+  // Return strip preview component if phase is preview
+  // Strip URL, composing state, compose error, download function, share function, retake function, back function, can share state 
   if (phase === 'preview') {
     return (
       <StripPreview
@@ -81,8 +109,11 @@ export default function App() {
     )
   }
 
+  // Return permission error component if error is defined
+  // Error state, start camera function, back function
   if (error) {
     return (
+      // Permission error component
       <PermissionError
         error={error}
         onRetry={() => void startCamera()}
@@ -92,9 +123,12 @@ export default function App() {
   }
 
   return (
+    /* Main container */
     <div className="min-h-dvh bg-[#0f0f14] px-4 py-6">
+      {/* Header */}
       <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">Photobooth</h1>
+        <h1 className="text-xl font-bold text-white">Love&Pop Photobooth made by 🌊</h1>
+        {/* Exit button */}
         <button
           type="button"
           onClick={handleBack}
@@ -103,7 +137,8 @@ export default function App() {
           Exit
         </button>
       </header>
-
+      
+    {/* Desktop */}
       <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-8 lg:grid-cols-[240px_1fr] lg:gap-6">
         <div className="hidden lg:block">
           <FilterPanel
@@ -113,6 +148,7 @@ export default function App() {
           />
         </div>
 
+    {/* Mobile */}
         <div className="flex flex-col items-center gap-4">
           <div className="w-full max-w-md flex flex-col gap-4 lg:hidden">
             <FilterPanel
@@ -122,28 +158,29 @@ export default function App() {
             />
           </div>
 
+          {/* Camera stage */}
           <CameraStage
             videoRef={videoRef}
             filterId={filterId}
             customLayouts={customLayouts}
             currentShot={currentShot}
-            capturedCount={photos.length}
+            //capturedCount={photos.length}
             ready={ready}
             loading={loading}
             countdown={countdown}
             flash={flash}
             capturing={captureBusy}
           />
+
+          {/* Photo grid */}
           <PhotoGrid
             photos={photos}
             currentShot={currentShot}
             customLayouts={customLayouts}
           />
 
+          {/* Capture panel */}
           <CapturePanel
-            showDate={false}
-            onShowDateChange={() => {}}
-            showDateOption={false}
             onCapture={handleCapture}
             captureDisabled={captureDisabled}
             captureLabel={

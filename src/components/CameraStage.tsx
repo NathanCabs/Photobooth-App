@@ -3,12 +3,13 @@ import type { FilterId } from '../types'
 import type { CustomFrameLayout } from '../utils/customFrameLayouts'
 import { getFilterCss } from '../utils/filters'
 
+//Cameras props
 type CameraStageProps = {
   videoRef: RefObject<HTMLVideoElement | null>
   filterId: FilterId
   customLayouts: CustomFrameLayout[] | null
   currentShot: number
-  capturedCount: number
+  //capturedCount: number
   ready: boolean
   loading: boolean
   countdown: number | null
@@ -16,24 +17,27 @@ type CameraStageProps = {
   capturing: boolean
 }
 
+/**
+   
+ 
 function getActiveShotIndex(currentShot: number, photoCount: number): number {
   if (currentShot > 0) return Math.min(currentShot - 1, 3)
   return Math.min(photoCount, 3)
-}
+}**/
 
 export function CameraStage({
   videoRef,
   filterId,
   customLayouts,
   currentShot,
-  capturedCount,
+  //capturedCount,
   ready,
   loading,
   countdown,
   flash,
   capturing,
 }: CameraStageProps) {
-  const shotIndex = getActiveShotIndex(currentShot, capturedCount)
+  const shotIndex = currentShot
   const customLayout = customLayouts ? customLayouts[shotIndex] : null
 
   const stageStyle = customLayout
