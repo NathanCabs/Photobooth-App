@@ -1,4 +1,4 @@
-import { FRAME_ASSETS } from './borders'
+import { FRAME_ASSETS } from '../data/frameAssets'
 import { getFrameMaskAssets, type HoleBounds } from './frameMask'
 
 /** Hole region as % of full frame — used for preview + video crop box. */

@@ -1,4 +1,5 @@
-import { CUSTOM_STRIP_WIDTH, FRAME_ASSETS } from './borders'
+import { CUSTOM_STRIP_WIDTH } from './borders'
+import { FRAME_ASSETS } from '../data/frameAssets'
 import { getFrameMaskAssets } from './frameMask'
 import type { HoleBounds } from './frameMask'
 
